@@ -11,8 +11,11 @@ dependencies = [
     "baml-py>=0.90.2",
     "elasticsearch>=9.0.2",
     "ipython>=9.3.0",
+    "pydantic>=2.11.7",
     "pytest",
     "python-dotenv>=1.1.1",
+    "rich>=14.0.0",
+    "typer>=0.16.0",
 ]
 
 [build-system]

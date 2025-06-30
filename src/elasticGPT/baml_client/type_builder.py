@@ -44,7 +44,7 @@ class ElasticQuestionAst:
     def __init__(self, tb: _TypeBuilder):
         _tb = tb._tb # type: ignore (we know how to use this private attribute)
         self._bldr = _tb.class_("ElasticQuestion")
-        self._properties: typing.Set[str] = set([ "category",  "question",  "answer", ])
+        self._properties: typing.Set[str] = set([ "category",  "question",  "endpoint",  "method",  "answer", ])
         self._props = ElasticQuestionProperties(self._bldr, self._properties)
 
     def type(self) -> FieldType:
@@ -79,6 +79,14 @@ class ElasticQuestionProperties:
     @property
     def question(self) -> ClassPropertyViewer:
         return ClassPropertyViewer(self.__bldr.property("question"))
+
+    @property
+    def endpoint(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("endpoint"))
+
+    @property
+    def method(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("method"))
 
     @property
     def answer(self) -> ClassPropertyViewer:

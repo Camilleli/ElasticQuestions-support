@@ -40,6 +40,8 @@ class StreamState(BaseModel, Generic[T]):
 class ElasticQuestion(BaseModel):
     category: Optional[types.Category] = None
     question: Optional[str] = None
+    endpoint: Optional[str] = None
+    method: Optional[Union[Literal["GET"], Literal["POST"], Literal["PUT"], Literal["DELETE"]]] = None
     answer: Optional[str] = None
 
 class ElasticSet(BaseModel):

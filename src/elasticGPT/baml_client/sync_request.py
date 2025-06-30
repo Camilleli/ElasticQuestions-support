@@ -21,7 +21,7 @@ import baml_py
 from . import _baml
 
 
-class AsyncHttpRequest:
+class HttpRequest:
     __runtime: baml_py.BamlRuntime
     __ctx_manager: baml_py.BamlCtxManager
 
@@ -30,9 +30,9 @@ class AsyncHttpRequest:
       self.__ctx_manager = ctx_manager
 
     
-    async def GenerateElasticCertificationQuestion(
+    def GenerateElasticCertificationQuestion(
         self,
-        subject: _baml.types.Category,context: List[_baml.types.ElasticSet],
+        subject: _baml.types.Category,index: str,mapping: str,data: str,context: List[_baml.types.ElasticSet],
         baml_options: _baml.BamlCallOptionsModApi = {},
     ) -> baml_py.HTTPRequest:
       __tb__ = baml_options.get("tb", None)
@@ -43,11 +43,10 @@ class AsyncHttpRequest:
       __cr__ = baml_options.get("client_registry", None)
       env = _baml.env_vars_to_dict(baml_options.get("env", {}))
 
-      return await self.__runtime.build_request(
+      return self.__runtime.build_request_sync(
         "GenerateElasticCertificationQuestion",
         {
-          "subject": subject,
-          "context": context,
+          "subject": subject,"index": index,"mapping": mapping,"data": data,"context": context,
         },
         self.__ctx_manager.get(),
         tb,
@@ -58,7 +57,7 @@ class AsyncHttpRequest:
     
 
 
-class AsyncHttpStreamRequest:
+class HttpStreamRequest:
     __runtime: baml_py.BamlRuntime
     __ctx_manager: baml_py.BamlCtxManager
 
@@ -67,9 +66,9 @@ class AsyncHttpStreamRequest:
       self.__ctx_manager = ctx_manager
 
     
-    async def GenerateElasticCertificationQuestion(
+    def GenerateElasticCertificationQuestion(
         self,
-        subject: _baml.types.Category,context: List[_baml.types.ElasticSet],
+        subject: _baml.types.Category,index: str,mapping: str,data: str,context: List[_baml.types.ElasticSet],
         baml_options: _baml.BamlCallOptionsModApi = {},
     ) -> baml_py.HTTPRequest:
       __tb__ = baml_options.get("tb", None)
@@ -80,11 +79,10 @@ class AsyncHttpStreamRequest:
       __cr__ = baml_options.get("client_registry", None)
       env = _baml.env_vars_to_dict(baml_options.get("env", {}))
 
-      return await self.__runtime.build_request(
+      return self.__runtime.build_request_sync(
         "GenerateElasticCertificationQuestion",
         {
-          "subject": subject,
-          "context": context,
+          "subject": subject,"index": index,"mapping": mapping,"data": data,"context": context,
         },
         self.__ctx_manager.get(),
         tb,
@@ -95,4 +93,4 @@ class AsyncHttpStreamRequest:
     
 
 
-__all__ = ["AsyncHttpRequest", "AsyncHttpStreamRequest"]
+__all__ = ["HttpRequest", "HttpStreamRequest"]

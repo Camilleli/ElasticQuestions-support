@@ -96,7 +96,7 @@ class BamlSyncClient:
     
     def GenerateElasticCertificationQuestion(
         self,
-        subject: _baml.types.Category,context: List[_baml.types.ElasticSet],
+        subject: _baml.types.Category,index: str,mapping: str,data: str,context: List[_baml.types.ElasticSet],
         baml_options: _baml.BamlCallOptions = {},
     ) -> _baml.types.ElasticQuestion:
       options: _baml.BamlCallOptions = {**self.__baml_options, **(baml_options or {})}
@@ -112,7 +112,7 @@ class BamlSyncClient:
       raw = self.__runtime.call_function_sync(
         "GenerateElasticCertificationQuestion",
         {
-          "subject": subject,"context": context,
+          "subject": subject,"index": index,"mapping": mapping,"data": data,"context": context,
         },
         self.__ctx_manager.get(),
         tb,
@@ -137,7 +137,7 @@ class BamlStreamClient:
     
     def GenerateElasticCertificationQuestion(
         self,
-        subject: _baml.types.Category,context: List[_baml.types.ElasticSet],
+        subject: _baml.types.Category,index: str,mapping: str,data: str,context: List[_baml.types.ElasticSet],
         baml_options: _baml.BamlCallOptions = {},
     ) -> baml_py.BamlSyncStream[_baml.partial_types.ElasticQuestion, _baml.types.ElasticQuestion]:
       options: _baml.BamlCallOptions = {**self.__baml_options, **(baml_options or {})}
@@ -154,6 +154,9 @@ class BamlStreamClient:
         "GenerateElasticCertificationQuestion",
         {
           "subject": subject,
+          "index": index,
+          "mapping": mapping,
+          "data": data,
           "context": context,
         },
         None,

@@ -52,6 +52,8 @@ class Category(str, Enum):
 class ElasticQuestion(BaseModel):
     category: "Category"
     question: str
+    endpoint: str
+    method: Union[Literal["GET"], Literal["POST"], Literal["PUT"], Literal["DELETE"]]
     answer: str
 
 class ElasticSet(BaseModel):
