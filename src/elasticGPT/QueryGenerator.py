@@ -67,7 +67,7 @@ def main(
     print_questions_table(good_questions)
     
     if save_to_file:
-        save_questions_to_markdown(good_questions, index, f"/generations/elastic_questions_{index}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md")
+        save_questions_to_markdown(good_questions, index, f"generations/elastic_questions_{index}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md")
 
 if __name__ == "__main__":
     typer.run(main)
