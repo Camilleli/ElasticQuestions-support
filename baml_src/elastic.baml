@@ -2,8 +2,6 @@
 enum Category {
   QUERY_DSL @description("Query DSL: Things like match, term, range, bool,, filter, script, exists etc.")
   AGGREGATIONS @description("Aggregations: terms, histograms, pipeline, top_hits, etc.")
-  MAPPING @description("Dnyamic mapping, nested fields, keyword versus text.")
-  INGEST @description("Ingest pipelines, reindexing, runtime fields, etc.")
   SCRIPTING @description("Use of the painless scripting language.")
 }
 
@@ -21,7 +19,8 @@ class ElasticSet {
 }
 
 function GenerateElasticCertificationQuestion(subject: Category, index: string, mapping: string, data: string, context: ElasticSet[]) -> ElasticQuestion {
-  client "openai/gpt-4.1"
+  // client "openai/gpt-4.1"
+  client "openai/gpt-4o"
   prompt #"
     {{_.role("system")}}
     You are an AI assistant trained to generated certification style questions for the Elastic Certified Engineer Exam. Your questions are targeted at the mapping provided by the user. Your goal is to create realistic and varied questions that reflect how Elastic has historially evaluated potential engineers in a proctored setting. For each question you generate, you will also generate a cognate answer that will be evaluated by an in-production Elasticsearch cluster. 
@@ -46,15 +45,13 @@ function GenerateElasticCertificationQuestion(subject: Category, index: string, 
     {% set max_examples = 3 %}
     {% if context %}
       Here are some examples of questions and answers categorized for your convenience and context to improve the quality of your output. 
-      {%if context.rating == "Bad" %}
-        {% for question in context[:max_examples] %}
+      {% for question in context[:max_examples] %}
+        {% if question.rating == "Bad" %}
           Poor Example: {{question.corpus}}
-        {% endfor %}
-      {% elif context.rating == "Good" %}
-        {% for question in context[:max_examples] %}
+        {% elif question.rating == "Good" %}
           Good Example: {{question.corpus}}
-        {% endfor %}
-      {% endif %}
+        {% endif %}
+      {% endfor %}
     {% endif %}
     ---
 
@@ -106,5 +103,3 @@ test ElasticCertificationQuestion {
     context []
   }
 }
-
-/// See if the mapping works better if there's data context. 

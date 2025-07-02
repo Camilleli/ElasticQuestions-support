@@ -142,7 +142,7 @@ class CategoryAst:
     def __init__(self, tb: _TypeBuilder):
         _tb = tb._tb # type: ignore (we know how to use this private attribute)
         self._bldr = _tb.enum("Category")
-        self._values: typing.Set[str] = set([ "QUERY_DSL",  "AGGREGATIONS",  "MAPPING",  "INGEST",  "SCRIPTING", ])
+        self._values: typing.Set[str] = set([ "QUERY_DSL",  "AGGREGATIONS",  "SCRIPTING", ])
         self._vals = CategoryValues(self._bldr, self._values)
 
     def type(self) -> FieldType:
@@ -176,16 +176,6 @@ class CategoryValues:
     @property
     def AGGREGATIONS(self) -> EnumValueViewer:
         return EnumValueViewer(self.__bldr.value("AGGREGATIONS"))
-    
-
-    @property
-    def MAPPING(self) -> EnumValueViewer:
-        return EnumValueViewer(self.__bldr.value("MAPPING"))
-    
-
-    @property
-    def INGEST(self) -> EnumValueViewer:
-        return EnumValueViewer(self.__bldr.value("INGEST"))
     
 
     @property

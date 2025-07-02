@@ -45,8 +45,6 @@ class Category(str, Enum):
     
     QUERY_DSL = "QUERY_DSL"
     AGGREGATIONS = "AGGREGATIONS"
-    MAPPING = "MAPPING"
-    INGEST = "INGEST"
     SCRIPTING = "SCRIPTING"
 
 class ElasticQuestion(BaseModel):
