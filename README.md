@@ -113,7 +113,15 @@ flowchart TD
     K -- Yes --> L["Print & optionally save to file"]
 ```
 
+## Helpful Commands
 
+Want to find the index you want to use? Define your ElasticSearch URL `$ES_URL` and API key `$API_KEY` and export them as environment variables. Then run:
+
+```bash
+curl -X GET "${ES_URL}/_cat/indices" \
+  -H "Authorization: ApiKey ${API_KEY}" \
+  -H "Content-Type: application/json"
+```
 
 ## 📚 Extending & Customizing
 
