@@ -37,6 +37,10 @@ class StreamState(BaseModel, Generic[T]):
     state: Literal["Pending", "Incomplete", "Complete"]
 
 
+class ElasticMultipleChoose(BaseModel):
+    question: Optional[str] = None
+    answer: Optional[str] = None
+
 class ElasticQuestion(BaseModel):
     category: Optional[types.Category] = None
     question: Optional[str] = None

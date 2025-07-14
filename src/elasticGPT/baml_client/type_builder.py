@@ -22,11 +22,15 @@ from .globals import DO_NOT_USE_DIRECTLY_UNLESS_YOU_KNOW_WHAT_YOURE_DOING_RUNTIM
 class TypeBuilder(_TypeBuilder):
     def __init__(self):
         super().__init__(classes=set(
-          ["ElasticQuestion","ElasticSet",]
+          ["ElasticMultipleChoose","ElasticQuestion","ElasticSet",]
         ), enums=set(
           ["Category",]
         ), runtime=DO_NOT_USE_DIRECTLY_UNLESS_YOU_KNOW_WHAT_YOURE_DOING_RUNTIME)
 
+
+    @property
+    def ElasticMultipleChoose(self) -> "ElasticMultipleChooseAst":
+        return ElasticMultipleChooseAst(self)
 
     @property
     def ElasticQuestion(self) -> "ElasticQuestionAst":
@@ -39,6 +43,48 @@ class TypeBuilder(_TypeBuilder):
 
 
 
+
+class ElasticMultipleChooseAst:
+    def __init__(self, tb: _TypeBuilder):
+        _tb = tb._tb # type: ignore (we know how to use this private attribute)
+        self._bldr = _tb.class_("ElasticMultipleChoose")
+        self._properties: typing.Set[str] = set([ "question",  "answer", ])
+        self._props = ElasticMultipleChooseProperties(self._bldr, self._properties)
+
+    def type(self) -> FieldType:
+        return self._bldr.field()
+
+    @property
+    def props(self) -> "ElasticMultipleChooseProperties":
+        return self._props
+
+
+class ElasticMultipleChooseViewer(ElasticMultipleChooseAst):
+    def __init__(self, tb: _TypeBuilder):
+        super().__init__(tb)
+
+    
+    def list_properties(self) -> typing.List[typing.Tuple[str, ClassPropertyViewer]]:
+        return [(name, ClassPropertyViewer(self._bldr.property(name))) for name in self._properties]
+
+
+
+class ElasticMultipleChooseProperties:
+    def __init__(self, bldr: ClassBuilder, properties: typing.Set[str]):
+        self.__bldr = bldr
+        self.__properties = properties
+
+    
+
+    @property
+    def question(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("question"))
+
+    @property
+    def answer(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("answer"))
+
+    
 
 class ElasticQuestionAst:
     def __init__(self, tb: _TypeBuilder):

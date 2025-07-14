@@ -13,9 +13,59 @@ class ElasticQuestion {
   answer string @description("The answer to the question in the form of a Elasticsearch DSL query.")
 }
 
+class ElasticMultipleChoose {
+  question string @description("The question posed in plain english that requires a person to interpret using reading comprehension at the 12th grade level.Questions is a multiple choose e.g( Question? A: possible answer 1, B: possible answer 2, C: possible answer 3, D: possible answer 4)")
+  answer string @description("The answer can only be one charactor from A to D")
+}
+
 class ElasticSet {
   corpus ElasticQuestion @description("The questions, answers and categories in the set")
   rating "Good" | "Bad" @description("The rating of the set")
+}
+
+function GenerateQuestionFromEnablementFile(enablementContent: string, context: ElasticSet[]) -> ElasticMultipleChoose {
+  // client "openai/gpt-4o"
+  client "openai/gpt-4o"
+  prompt #"
+    {{_.role("system")}}
+    You are an AI assistant trained to generate questions based on enablement content provided in a text file. Your task is to create questions that test the knowledge of the content within the file. The questions should be realistic and reflect the depth of understanding expected from someone who has studied the enablement material.
+
+    For each question you generate:
+    1. The question should be posed in plain English that requires a person to interpret using reading comprehension at the 6th grade level.
+    2. Use the content of the enablement file as the data context.
+    3. Provide the **question text** and the **correct answer** in the form of a JSON object.
+    4. Ensure the questions are challenging yet fair, suitable for someone who has thoroughly reviewed the enablement content.
+    5. Provide any necessary context or background information that might be needed to answer the question.
+    6. The target is to help support engineer become better on understanding the subject matter and troubleshooting
+   
+    Format the output as a JSON object with the following schema:
+
+    ---
+    // {{ctx.output_format}}
+    ---
+
+    {{_.role("assistant")}}
+    {% set max_examples = 3 %}
+    {% if context %}
+      Here are some examples of questions and answers categorized for your convenience and context to improve the quality of your output. 
+      {% for question in context[:max_examples] %}
+        {% if question.rating == "Bad" %}
+          Poor Example: {{question.corpus}}
+        {% elif question.rating == "Good" %}
+          Good Example: {{question.corpus}}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+    ---
+
+    {{_.role("user")}}
+    Here is the content of the enablement file:
+    ---
+    {{enablementContent}}
+    ---
+    {{_.role("user")}}
+    Generate a question and answer pair based on the enablement content.
+  "#
 }
 
 function GenerateElasticCertificationQuestion(subject: Category, index: string, mapping: string, data: string, context: ElasticSet[]) -> ElasticQuestion {

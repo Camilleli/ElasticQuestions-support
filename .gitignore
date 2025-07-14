@@ -11,3 +11,8 @@ wheels/
 
 # Environment variables
 .env
+
+# cmpjp test files
+test.sh
+result.log
+Elasticsearch Onboarding.txt

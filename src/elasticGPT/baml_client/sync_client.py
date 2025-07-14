@@ -122,6 +122,34 @@ class BamlSyncClient:
       )
       return cast(_baml.types.ElasticQuestion, raw.cast_to(_baml.types, _baml.types, _baml.partial_types, False))
     
+    def GenerateQuestionFromEnablementFile(
+        self,
+        enablementContent: str,context: List[_baml.types.ElasticSet],
+        baml_options: _baml.BamlCallOptions = {},
+    ) -> _baml.types.ElasticMultipleChoose:
+      options: _baml.BamlCallOptions = {**self.__baml_options, **(baml_options or {})}
+      __tb__ = options.get("tb", None)
+      if __tb__ is not None:
+        tb = __tb__._tb # type: ignore (we know how to use this private attribute)
+      else:
+        tb = None
+      __cr__ = options.get("client_registry", None)
+      collector = options.get("collector", None)
+      collectors = collector if isinstance(collector, list) else [collector] if collector is not None else []
+      env = _baml.env_vars_to_dict(options.get("env", {}))
+      raw = self.__runtime.call_function_sync(
+        "GenerateQuestionFromEnablementFile",
+        {
+          "enablementContent": enablementContent,"context": context,
+        },
+        self.__ctx_manager.get(),
+        tb,
+        __cr__,
+        collectors,
+        env,
+      )
+      return cast(_baml.types.ElasticMultipleChoose, raw.cast_to(_baml.types, _baml.types, _baml.partial_types, False))
+    
 
 
 
@@ -171,6 +199,42 @@ class BamlStreamClient:
         raw,
         lambda x: cast(_baml.partial_types.ElasticQuestion, x.cast_to(_baml.types, _baml.types, _baml.partial_types, True)),
         lambda x: cast(_baml.types.ElasticQuestion, x.cast_to(_baml.types, _baml.types, _baml.partial_types, False)),
+        self.__ctx_manager.get(),
+      )
+    
+    def GenerateQuestionFromEnablementFile(
+        self,
+        enablementContent: str,context: List[_baml.types.ElasticSet],
+        baml_options: _baml.BamlCallOptions = {},
+    ) -> baml_py.BamlSyncStream[_baml.partial_types.ElasticMultipleChoose, _baml.types.ElasticMultipleChoose]:
+      options: _baml.BamlCallOptions = {**self.__baml_options, **(baml_options or {})}
+      __tb__ = options.get("tb", None)
+      if __tb__ is not None:
+        tb = __tb__._tb # type: ignore (we know how to use this private attribute)
+      else:
+        tb = None
+      __cr__ = options.get("client_registry", None)
+      collector = options.get("collector", None)
+      collectors = collector if isinstance(collector, list) else [collector] if collector is not None else []
+      env = _baml.env_vars_to_dict(options.get("env", {}))
+      raw = self.__runtime.stream_function_sync(
+        "GenerateQuestionFromEnablementFile",
+        {
+          "enablementContent": enablementContent,
+          "context": context,
+        },
+        None,
+        self.__ctx_manager.get(),
+        tb,
+        __cr__,
+        collectors,
+        env,
+      )
+
+      return baml_py.BamlSyncStream[_baml.partial_types.ElasticMultipleChoose, _baml.types.ElasticMultipleChoose](
+        raw,
+        lambda x: cast(_baml.partial_types.ElasticMultipleChoose, x.cast_to(_baml.types, _baml.types, _baml.partial_types, True)),
+        lambda x: cast(_baml.types.ElasticMultipleChoose, x.cast_to(_baml.types, _baml.types, _baml.partial_types, False)),
         self.__ctx_manager.get(),
       )
     

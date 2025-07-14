@@ -55,6 +55,31 @@ class HttpRequest:
         False,
       )
     
+    def GenerateQuestionFromEnablementFile(
+        self,
+        enablementContent: str,context: List[_baml.types.ElasticSet],
+        baml_options: _baml.BamlCallOptionsModApi = {},
+    ) -> baml_py.HTTPRequest:
+      __tb__ = baml_options.get("tb", None)
+      if __tb__ is not None:
+        tb = __tb__._tb # type: ignore (we know how to use this private attribute)
+      else:
+        tb = None
+      __cr__ = baml_options.get("client_registry", None)
+      env = _baml.env_vars_to_dict(baml_options.get("env", {}))
+
+      return self.__runtime.build_request_sync(
+        "GenerateQuestionFromEnablementFile",
+        {
+          "enablementContent": enablementContent,"context": context,
+        },
+        self.__ctx_manager.get(),
+        tb,
+        __cr__,
+        env,
+        False,
+      )
+    
 
 
 class HttpStreamRequest:
@@ -83,6 +108,31 @@ class HttpStreamRequest:
         "GenerateElasticCertificationQuestion",
         {
           "subject": subject,"index": index,"mapping": mapping,"data": data,"context": context,
+        },
+        self.__ctx_manager.get(),
+        tb,
+        __cr__,
+        env,
+        True,
+      )
+    
+    def GenerateQuestionFromEnablementFile(
+        self,
+        enablementContent: str,context: List[_baml.types.ElasticSet],
+        baml_options: _baml.BamlCallOptionsModApi = {},
+    ) -> baml_py.HTTPRequest:
+      __tb__ = baml_options.get("tb", None)
+      if __tb__ is not None:
+        tb = __tb__._tb # type: ignore (we know how to use this private attribute)
+      else:
+        tb = None
+      __cr__ = baml_options.get("client_registry", None)
+      env = _baml.env_vars_to_dict(baml_options.get("env", {}))
+
+      return self.__runtime.build_request_sync(
+        "GenerateQuestionFromEnablementFile",
+        {
+          "enablementContent": enablementContent,"context": context,
         },
         self.__ctx_manager.get(),
         tb,

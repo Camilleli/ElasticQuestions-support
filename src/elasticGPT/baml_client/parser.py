@@ -60,6 +60,35 @@ class LlmResponseParser:
 
       return cast(_baml.types.ElasticQuestion, parsed)
     
+    def GenerateQuestionFromEnablementFile(
+        self,
+        llm_response: str,
+        baml_options: _baml.BamlCallOptionsModApi = {},
+    ) -> _baml.types.ElasticMultipleChoose:
+      __tb__ = baml_options.get("tb", None)
+      if __tb__ is not None:
+        tb = __tb__._tb # type: ignore (we know how to use this private attribute)
+      else:
+        tb = None
+      __cr__ = baml_options.get("client_registry", None)
+
+      env = _baml.env_vars_to_dict(baml_options.get("env", {}))
+
+      parsed = self.__runtime.parse_llm_response(
+        "GenerateQuestionFromEnablementFile",
+        llm_response,
+        _baml.types,
+        _baml.types,
+        _baml.partial_types,
+        False,
+        self.__ctx_manager.get(),
+        tb,
+        __cr__,
+        env,
+      )
+
+      return cast(_baml.types.ElasticMultipleChoose, parsed)
+    
 
 
 class LlmStreamParser:
@@ -99,6 +128,35 @@ class LlmStreamParser:
       )
 
       return cast(_baml.partial_types.ElasticQuestion, parsed)
+    
+    def GenerateQuestionFromEnablementFile(
+        self,
+        llm_response: str,
+        baml_options: _baml.BamlCallOptionsModApi = {},
+    ) -> _baml.partial_types.ElasticMultipleChoose:
+      __tb__ = baml_options.get("tb", None)
+      if __tb__ is not None:
+        tb = __tb__._tb # type: ignore (we know how to use this private attribute)
+      else:
+        tb = None
+      __cr__ = baml_options.get("client_registry", None)
+
+      env = _baml.env_vars_to_dict(baml_options.get("env", {}))
+
+      parsed = self.__runtime.parse_llm_response(
+        "GenerateQuestionFromEnablementFile",
+        llm_response,
+        _baml.types,
+        _baml.types,
+        _baml.partial_types,
+        True,
+        self.__ctx_manager.get(),
+        tb,
+        __cr__,
+        env,
+      )
+
+      return cast(_baml.partial_types.ElasticMultipleChoose, parsed)
     
 
 

@@ -47,6 +47,10 @@ class Category(str, Enum):
     AGGREGATIONS = "AGGREGATIONS"
     SCRIPTING = "SCRIPTING"
 
+class ElasticMultipleChoose(BaseModel):
+    question: str
+    answer: str
+
 class ElasticQuestion(BaseModel):
     category: "Category"
     question: str
