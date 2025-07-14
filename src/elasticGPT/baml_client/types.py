@@ -51,6 +51,15 @@ class ElasticMultipleChoose(BaseModel):
     question: str
     answer: str
 
+class ElasticMultipleChooseSet(BaseModel):
+    questionClass: "ElasticMultipleChoose"
+    validationClass: "ElasticMultipleChooseValidation"
+
+class ElasticMultipleChooseValidation(BaseModel):
+    isValid: Union[Literal[True], Literal[False]]
+    reason: str
+    location: str
+
 class ElasticQuestion(BaseModel):
     category: "Category"
     question: str

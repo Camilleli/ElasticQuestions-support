@@ -126,7 +126,7 @@ class BamlAsyncClient:
     
     async def GenerateQuestionFromEnablementFile(
         self,
-        enablementContent: str,context: List[_baml.types.ElasticSet],
+        enablementContent: str,questionBank: List[_baml.types.ElasticMultipleChooseSet],
         baml_options: _baml.BamlCallOptions = {},
     ) -> _baml.types.ElasticMultipleChoose:
       options: _baml.BamlCallOptions = {**self.__baml_options, **(baml_options or {})}
@@ -143,7 +143,7 @@ class BamlAsyncClient:
       raw = await self.__runtime.call_function(
         "GenerateQuestionFromEnablementFile",
         {
-          "enablementContent": enablementContent,"context": context,
+          "enablementContent": enablementContent,"questionBank": questionBank,
         },
         self.__ctx_manager.clone_context(),
         tb,
@@ -152,6 +152,35 @@ class BamlAsyncClient:
         env,
       )
       return cast(_baml.types.ElasticMultipleChoose, raw.cast_to(_baml.types, _baml.types, _baml.partial_types, False))
+    
+    async def ValidateGeneratedQuestion(
+        self,
+        questionObject: _baml.types.ElasticMultipleChoose,enablementContent: str,
+        baml_options: _baml.BamlCallOptions = {},
+    ) -> _baml.types.ElasticMultipleChooseValidation:
+      options: _baml.BamlCallOptions = {**self.__baml_options, **(baml_options or {})}
+
+      __tb__ = options.get("tb", None)
+      if __tb__ is not None:
+        tb = __tb__._tb # type: ignore (we know how to use this private attribute)
+      else:
+        tb = None
+      __cr__ = options.get("client_registry", None)
+      collector = options.get("collector", None)
+      collectors = collector if isinstance(collector, list) else [collector] if collector is not None else []
+      env = _baml.env_vars_to_dict(options.get("env", {}))
+      raw = await self.__runtime.call_function(
+        "ValidateGeneratedQuestion",
+        {
+          "questionObject": questionObject,"enablementContent": enablementContent,
+        },
+        self.__ctx_manager.clone_context(),
+        tb,
+        __cr__,
+        collectors,
+        env,
+      )
+      return cast(_baml.types.ElasticMultipleChooseValidation, raw.cast_to(_baml.types, _baml.types, _baml.partial_types, False))
     
 
 
@@ -206,7 +235,7 @@ class BamlStreamClient:
     
     def GenerateQuestionFromEnablementFile(
         self,
-        enablementContent: str,context: List[_baml.types.ElasticSet],
+        enablementContent: str,questionBank: List[_baml.types.ElasticMultipleChooseSet],
         baml_options: _baml.BamlCallOptions = {},
     ) -> baml_py.BamlStream[_baml.partial_types.ElasticMultipleChoose, _baml.types.ElasticMultipleChoose]:
       options: _baml.BamlCallOptions = {**self.__baml_options, **(baml_options or {})}
@@ -223,7 +252,7 @@ class BamlStreamClient:
         "GenerateQuestionFromEnablementFile",
         {
           "enablementContent": enablementContent,
-          "context": context,
+          "questionBank": questionBank,
         },
         None,
         self.__ctx_manager.get(),
@@ -237,6 +266,42 @@ class BamlStreamClient:
         raw,
         lambda x: cast(_baml.partial_types.ElasticMultipleChoose, x.cast_to(_baml.types, _baml.types, _baml.partial_types, True)),
         lambda x: cast(_baml.types.ElasticMultipleChoose, x.cast_to(_baml.types, _baml.types, _baml.partial_types, False)),
+        self.__ctx_manager.get(),
+      )
+    
+    def ValidateGeneratedQuestion(
+        self,
+        questionObject: _baml.types.ElasticMultipleChoose,enablementContent: str,
+        baml_options: _baml.BamlCallOptions = {},
+    ) -> baml_py.BamlStream[_baml.partial_types.ElasticMultipleChooseValidation, _baml.types.ElasticMultipleChooseValidation]:
+      options: _baml.BamlCallOptions = {**self.__baml_options, **(baml_options or {})}
+      __tb__ = options.get("tb", None)
+      if __tb__ is not None:
+        tb = __tb__._tb # type: ignore (we know how to use this private attribute)
+      else:
+        tb = None
+      __cr__ = options.get("client_registry", None)
+      collector = options.get("collector", None)
+      collectors = collector if isinstance(collector, list) else [collector] if collector is not None else []
+      env = _baml.env_vars_to_dict(options.get("env", {}))
+      raw = self.__runtime.stream_function(
+        "ValidateGeneratedQuestion",
+        {
+          "questionObject": questionObject,
+          "enablementContent": enablementContent,
+        },
+        None,
+        self.__ctx_manager.get(),
+        tb,
+        __cr__,
+        collectors,
+        env,
+      )
+
+      return baml_py.BamlStream[_baml.partial_types.ElasticMultipleChooseValidation, _baml.types.ElasticMultipleChooseValidation](
+        raw,
+        lambda x: cast(_baml.partial_types.ElasticMultipleChooseValidation, x.cast_to(_baml.types, _baml.types, _baml.partial_types, True)),
+        lambda x: cast(_baml.types.ElasticMultipleChooseValidation, x.cast_to(_baml.types, _baml.types, _baml.partial_types, False)),
         self.__ctx_manager.get(),
       )
     

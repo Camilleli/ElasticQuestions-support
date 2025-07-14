@@ -57,7 +57,7 @@ class HttpRequest:
     
     def GenerateQuestionFromEnablementFile(
         self,
-        enablementContent: str,context: List[_baml.types.ElasticSet],
+        enablementContent: str,questionBank: List[_baml.types.ElasticMultipleChooseSet],
         baml_options: _baml.BamlCallOptionsModApi = {},
     ) -> baml_py.HTTPRequest:
       __tb__ = baml_options.get("tb", None)
@@ -71,7 +71,32 @@ class HttpRequest:
       return self.__runtime.build_request_sync(
         "GenerateQuestionFromEnablementFile",
         {
-          "enablementContent": enablementContent,"context": context,
+          "enablementContent": enablementContent,"questionBank": questionBank,
+        },
+        self.__ctx_manager.get(),
+        tb,
+        __cr__,
+        env,
+        False,
+      )
+    
+    def ValidateGeneratedQuestion(
+        self,
+        questionObject: _baml.types.ElasticMultipleChoose,enablementContent: str,
+        baml_options: _baml.BamlCallOptionsModApi = {},
+    ) -> baml_py.HTTPRequest:
+      __tb__ = baml_options.get("tb", None)
+      if __tb__ is not None:
+        tb = __tb__._tb # type: ignore (we know how to use this private attribute)
+      else:
+        tb = None
+      __cr__ = baml_options.get("client_registry", None)
+      env = _baml.env_vars_to_dict(baml_options.get("env", {}))
+
+      return self.__runtime.build_request_sync(
+        "ValidateGeneratedQuestion",
+        {
+          "questionObject": questionObject,"enablementContent": enablementContent,
         },
         self.__ctx_manager.get(),
         tb,
@@ -118,7 +143,7 @@ class HttpStreamRequest:
     
     def GenerateQuestionFromEnablementFile(
         self,
-        enablementContent: str,context: List[_baml.types.ElasticSet],
+        enablementContent: str,questionBank: List[_baml.types.ElasticMultipleChooseSet],
         baml_options: _baml.BamlCallOptionsModApi = {},
     ) -> baml_py.HTTPRequest:
       __tb__ = baml_options.get("tb", None)
@@ -132,7 +157,32 @@ class HttpStreamRequest:
       return self.__runtime.build_request_sync(
         "GenerateQuestionFromEnablementFile",
         {
-          "enablementContent": enablementContent,"context": context,
+          "enablementContent": enablementContent,"questionBank": questionBank,
+        },
+        self.__ctx_manager.get(),
+        tb,
+        __cr__,
+        env,
+        True,
+      )
+    
+    def ValidateGeneratedQuestion(
+        self,
+        questionObject: _baml.types.ElasticMultipleChoose,enablementContent: str,
+        baml_options: _baml.BamlCallOptionsModApi = {},
+    ) -> baml_py.HTTPRequest:
+      __tb__ = baml_options.get("tb", None)
+      if __tb__ is not None:
+        tb = __tb__._tb # type: ignore (we know how to use this private attribute)
+      else:
+        tb = None
+      __cr__ = baml_options.get("client_registry", None)
+      env = _baml.env_vars_to_dict(baml_options.get("env", {}))
+
+      return self.__runtime.build_request_sync(
+        "ValidateGeneratedQuestion",
+        {
+          "questionObject": questionObject,"enablementContent": enablementContent,
         },
         self.__ctx_manager.get(),
         tb,

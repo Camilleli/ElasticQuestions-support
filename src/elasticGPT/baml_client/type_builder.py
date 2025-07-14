@@ -22,7 +22,7 @@ from .globals import DO_NOT_USE_DIRECTLY_UNLESS_YOU_KNOW_WHAT_YOURE_DOING_RUNTIM
 class TypeBuilder(_TypeBuilder):
     def __init__(self):
         super().__init__(classes=set(
-          ["ElasticMultipleChoose","ElasticQuestion","ElasticSet",]
+          ["ElasticMultipleChoose","ElasticMultipleChooseSet","ElasticMultipleChooseValidation","ElasticQuestion","ElasticSet",]
         ), enums=set(
           ["Category",]
         ), runtime=DO_NOT_USE_DIRECTLY_UNLESS_YOU_KNOW_WHAT_YOURE_DOING_RUNTIME)
@@ -31,6 +31,14 @@ class TypeBuilder(_TypeBuilder):
     @property
     def ElasticMultipleChoose(self) -> "ElasticMultipleChooseAst":
         return ElasticMultipleChooseAst(self)
+
+    @property
+    def ElasticMultipleChooseSet(self) -> "ElasticMultipleChooseSetAst":
+        return ElasticMultipleChooseSetAst(self)
+
+    @property
+    def ElasticMultipleChooseValidation(self) -> "ElasticMultipleChooseValidationAst":
+        return ElasticMultipleChooseValidationAst(self)
 
     @property
     def ElasticQuestion(self) -> "ElasticQuestionAst":
@@ -83,6 +91,94 @@ class ElasticMultipleChooseProperties:
     @property
     def answer(self) -> ClassPropertyViewer:
         return ClassPropertyViewer(self.__bldr.property("answer"))
+
+    
+
+class ElasticMultipleChooseSetAst:
+    def __init__(self, tb: _TypeBuilder):
+        _tb = tb._tb # type: ignore (we know how to use this private attribute)
+        self._bldr = _tb.class_("ElasticMultipleChooseSet")
+        self._properties: typing.Set[str] = set([ "questionClass",  "validationClass", ])
+        self._props = ElasticMultipleChooseSetProperties(self._bldr, self._properties)
+
+    def type(self) -> FieldType:
+        return self._bldr.field()
+
+    @property
+    def props(self) -> "ElasticMultipleChooseSetProperties":
+        return self._props
+
+
+class ElasticMultipleChooseSetViewer(ElasticMultipleChooseSetAst):
+    def __init__(self, tb: _TypeBuilder):
+        super().__init__(tb)
+
+    
+    def list_properties(self) -> typing.List[typing.Tuple[str, ClassPropertyViewer]]:
+        return [(name, ClassPropertyViewer(self._bldr.property(name))) for name in self._properties]
+
+
+
+class ElasticMultipleChooseSetProperties:
+    def __init__(self, bldr: ClassBuilder, properties: typing.Set[str]):
+        self.__bldr = bldr
+        self.__properties = properties
+
+    
+
+    @property
+    def questionClass(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("questionClass"))
+
+    @property
+    def validationClass(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("validationClass"))
+
+    
+
+class ElasticMultipleChooseValidationAst:
+    def __init__(self, tb: _TypeBuilder):
+        _tb = tb._tb # type: ignore (we know how to use this private attribute)
+        self._bldr = _tb.class_("ElasticMultipleChooseValidation")
+        self._properties: typing.Set[str] = set([ "isValid",  "reason",  "location", ])
+        self._props = ElasticMultipleChooseValidationProperties(self._bldr, self._properties)
+
+    def type(self) -> FieldType:
+        return self._bldr.field()
+
+    @property
+    def props(self) -> "ElasticMultipleChooseValidationProperties":
+        return self._props
+
+
+class ElasticMultipleChooseValidationViewer(ElasticMultipleChooseValidationAst):
+    def __init__(self, tb: _TypeBuilder):
+        super().__init__(tb)
+
+    
+    def list_properties(self) -> typing.List[typing.Tuple[str, ClassPropertyViewer]]:
+        return [(name, ClassPropertyViewer(self._bldr.property(name))) for name in self._properties]
+
+
+
+class ElasticMultipleChooseValidationProperties:
+    def __init__(self, bldr: ClassBuilder, properties: typing.Set[str]):
+        self.__bldr = bldr
+        self.__properties = properties
+
+    
+
+    @property
+    def isValid(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("isValid"))
+
+    @property
+    def reason(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("reason"))
+
+    @property
+    def location(self) -> ClassPropertyViewer:
+        return ClassPropertyViewer(self.__bldr.property("location"))
 
     
 

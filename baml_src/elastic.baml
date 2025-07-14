@@ -17,13 +17,62 @@ class ElasticMultipleChoose {
   question string @description("The question posed in plain english that requires a person to interpret using reading comprehension at the 12th grade level.Questions is a multiple choose e.g( Question? A: possible answer 1, B: possible answer 2, C: possible answer 3, D: possible answer 4)")
   answer string @description("The answer can only be one charactor from A to D")
 }
+class ElasticMultipleChooseValidation {
+  isValid true | false @description("simple true and false value")
+  reason string @description("Explanation of why the question is valid or not")
+  location string @description("Where in the enablement content related to the question/answer was found")
+}
 
+class ElasticMultipleChooseSet {
+  questionClass ElasticMultipleChoose @description("The multiple-choice question and its possible answers")
+  validationClass ElasticMultipleChooseValidation @description("The validation result of the multiple-choice question, including its validity and reasoning")
+}
 class ElasticSet {
   corpus ElasticQuestion @description("The questions, answers and categories in the set")
   rating "Good" | "Bad" @description("The rating of the set")
 }
+function ValidateGeneratedQuestion(questionObject: ElasticMultipleChoose, enablementContent: string) -> ElasticMultipleChooseValidation {
+   // client "openai/gpt-4o"
+  client "openai/gpt-4o"
+  prompt #"
+    {{_.role("system")}}
+    You are an AI assistant tasked with validating questions generated from enablement content. Your goal is to determine if the question is relevant to the content and if it effectively assesses understanding of the material.
 
-function GenerateQuestionFromEnablementFile(enablementContent: string, context: ElasticSet[]) -> ElasticMultipleChoose {
+    For validation:
+    1. Ensure the question is related to the enablement content in concepts, do not need to have exact wording.
+    2. Check if the question is clear.
+    3. Determine if the question is challenging yet fair, suitable for someone who has thoroughly reviewed the enablement content.
+    4. Ensure that only one of the provided answers is correct, and the rest are incorrect.
+    5. Verify that the question and answers accurately reflect the key concepts, roles, functions, and any other relevant details described in the enablement content.
+
+    question: 
+    ---
+    {{questionObject.question}}
+    ---
+
+    enablement content:
+    ---
+    {{enablementContent}}
+    ---
+    // {{ctx.output_format}}
+    ---
+
+    {{_.role("assistant")}}
+    {% set correct_answer = questionObject.answer %}
+    {% set options = ["A", "B", "C", "D"] %}
+    {% if questionObject.question in enablementContent and correct_answer in options %}
+      {% if enablementContent.contains(correct_answer) and options|reject('equalto', correct_answer)|map('in', enablementContent)|list|length == 0 %}
+        true
+      {% else %}
+        false
+      {% endif %}
+    {% else %}
+      false
+    {% endif %}
+  "#
+}
+
+function GenerateQuestionFromEnablementFile(enablementContent: string, questionBank: ElasticMultipleChooseSet[]) -> ElasticMultipleChoose {
   // client "openai/gpt-4o"
   client "openai/gpt-4o"
   prompt #"
@@ -32,12 +81,12 @@ function GenerateQuestionFromEnablementFile(enablementContent: string, context: 
 
     For each question you generate:
     1. The question should be posed in plain English that requires a person to interpret using reading comprehension at the 6th grade level.
-    2. Use the content of the enablement file as the data context.
+    2. Use the content of the enablement file as the data context. And question should not ask outside of enablement file.
     3. Provide the **question text** and the **correct answer** in the form of a JSON object.
     4. Ensure the questions are challenging yet fair, suitable for someone who has thoroughly reviewed the enablement content.
     5. Provide any necessary context or background information that might be needed to answer the question.
     6. The target is to help support engineer become better on understanding the subject matter and troubleshooting
-   
+
     Format the output as a JSON object with the following schema:
 
     ---
@@ -46,14 +95,11 @@ function GenerateQuestionFromEnablementFile(enablementContent: string, context: 
 
     {{_.role("assistant")}}
     {% set max_examples = 3 %}
-    {% if context %}
-      Here are some examples of questions and answers categorized for your convenience and context to improve the quality of your output. 
-      {% for question in context[:max_examples] %}
-        {% if question.rating == "Bad" %}
-          Poor Example: {{question.corpus}}
-        {% elif question.rating == "Good" %}
-          Good Example: {{question.corpus}}
-        {% endif %}
+    {% set good_questions = question_bank | selectattr('validationClass.isValid', 'equalto', true) | map(attribute='questionClass') | list %}
+    {% if good_questions %}
+      Here are some examples of good questions to avoid generating similar ones:
+      {% for question in good_questions %}
+        Good Example: {{question}}
       {% endfor %}
     {% endif %}
     ---
@@ -64,7 +110,7 @@ function GenerateQuestionFromEnablementFile(enablementContent: string, context: 
     {{enablementContent}}
     ---
     {{_.role("user")}}
-    Generate a question and answer pair based on the enablement content.
+    Generate a question and answer pair based on the enablement content, ensuring it is not similar to the good questions provided.
   "#
 }
 

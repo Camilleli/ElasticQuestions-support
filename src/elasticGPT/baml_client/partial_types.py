@@ -41,6 +41,15 @@ class ElasticMultipleChoose(BaseModel):
     question: Optional[str] = None
     answer: Optional[str] = None
 
+class ElasticMultipleChooseSet(BaseModel):
+    questionClass: Optional["ElasticMultipleChoose"] = None
+    validationClass: Optional["ElasticMultipleChooseValidation"] = None
+
+class ElasticMultipleChooseValidation(BaseModel):
+    isValid: Optional[Union[Literal[True], Literal[False]]] = None
+    reason: Optional[str] = None
+    location: Optional[str] = None
+
 class ElasticQuestion(BaseModel):
     category: Optional[types.Category] = None
     question: Optional[str] = None
