@@ -7,15 +7,14 @@ import dotenv
 from datetime import datetime
 from elasticGPT.utils.helpers import save_questions_to_json
 import time
-from typing import Annotated
 import json
 import re
 dotenv.load_dotenv()
 
 
 def main( 
-    elastic_curl_url: str = typer.Option(os.getenv("TEST_URL"), envvar="TEST_URL", help="What is your Elastic upload URL?",prompt="What is your Elastic upload URL?"),
-    num_desired_questions: Annotated[int, typer.Option(..., prompt="How many questions do you want to generate?")] = 20,
+    elastic_curl_url: str = typer.Option(os.getenv("TEST_URL"), envvar="TEST_URL", help="What is your Elastic upload URL?", prompt="What is your Elastic upload URL?"),
+    num_desired_questions: int = typer.Option(os.getenv("NUM_DESIRED_QUESTIONS"), envvar="NUM_DESIRED_QUESTIONS", help="How many questions do you want to generate?", prompt="How many questions do you want to generate?"),
 ):
     file_content = download_file(elastic_curl_url)
     question_bank: list[ElasticMultipleChooseSet] = []
