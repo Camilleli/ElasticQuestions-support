@@ -7,8 +7,10 @@ import dotenv
 from datetime import datetime
 from elasticGPT.utils.helpers import save_questions_to_json
 import time
+from typing import Annotated
 
 dotenv.load_dotenv()
+
 
 def main( 
     elastic_curl_url: str = typer.Option(os.getenv("TEST_URL"), envvar="TEST_URL", help="What is your Elastic upload URL?",prompt="What is your Elastic upload URL?"),
