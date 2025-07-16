@@ -13,25 +13,26 @@ class ElasticQuestion {
   answer string @description("The answer to the question in the form of a Elasticsearch DSL query.")
 }
 
-class ElasticMultipleChoose {
-  question string @description("The question posed in plain english that requires a person to interpret using reading comprehension at the 12th grade level.Questions is a multiple choose e.g( Question? A: possible answer 1, B: possible answer 2, C: possible answer 3, D: possible answer 4)")
-  answer string @description("The answer can only be one charactor from A to D")
+class ElasticMultipleTypeQuestion {
+  question string @description("The question posed in plain English that requires a person to interpret using reading comprehension at the 12th grade level. The question can be either multiple choice (e.g., Question? A: possible answer 1, B: possible answer 2, C: possible answer 3, D: possible answer 4) or fill-in-the-blank with an answer no more than three words.")
+  answer string @description("The answer can only be one character from A to D for multiple choice questions, or a string for fill-in-the-blank questions.")
+  questionType "mc" | "fill-in-the-blank" @description("The type of question, either multiple choice (mc) or fill-in-the-blank")
 }
-class ElasticMultipleChooseValidation {
+class ElasticMultipleTypeQuestionValidation {
   isValid true | false @description("simple true and false value")
   reason string @description("Explanation of why the question is valid or not")
   location string @description("Where in the enablement content related to the question/answer was found")
 }
 
-class ElasticMultipleChooseSet {
-  questionClass ElasticMultipleChoose @description("The multiple-choice question and its possible answers")
-  validationClass ElasticMultipleChooseValidation @description("The validation result of the multiple-choice question, including its validity and reasoning")
+class ElasticMultipleTypeQuestionSet {
+  questionClass ElasticMultipleTypeQuestion @description("The multiple-choice question and its possible answers")
+  validationClass ElasticMultipleTypeQuestionValidation @description("The validation result of the multiple-choice question, including its validity and reasoning")
 }
 class ElasticSet {
   corpus ElasticQuestion @description("The questions, answers and categories in the set")
   rating "Good" | "Bad" @description("The rating of the set")
 }
-function ValidateGeneratedQuestion(questionObject: ElasticMultipleChoose, enablementContent: string) -> ElasticMultipleChooseValidation {
+function ValidateGeneratedQuestion(questionObject: ElasticMultipleTypeQuestion, enablementContent: string) -> ElasticMultipleTypeQuestionValidation {
    // client "openai/gpt-4o"
   client "openai/gpt-4o"
   prompt #"
@@ -58,10 +59,22 @@ function ValidateGeneratedQuestion(questionObject: ElasticMultipleChoose, enable
     ---
 
     {{_.role("assistant")}}
-    {% set correct_answer = questionObject.answer %}
-    {% set options = ["A", "B", "C", "D"] %}
-    {% if questionObject.question in enablementContent and correct_answer in options %}
-      {% if enablementContent.contains(correct_answer) and options|reject('equalto', correct_answer)|map('in', enablementContent)|list|length == 0 %}
+    {% if questionObject.questionType == "mc" %}
+      {% set correct_answer = questionObject.answer %}
+      {% set options = ["A", "B", "C", "D"] %}
+      {% if correct_answer in options %}
+        {% set is_valid = correct_answer in enablementContent and options|select('equalto', correct_answer)|list|length == 1 %}
+        {% if is_valid %}
+          true
+        {% else %}
+          false
+        {% endif %}
+      {% else %}
+        false
+      {% endif %}
+    {% elif questionObject.questionType == "fill-in-the-blank" %}
+      {% set correct_answer = questionObject.answer %}
+      {% if correct_answer in enablementContent %}
         true
       {% else %}
         false
@@ -72,7 +85,7 @@ function ValidateGeneratedQuestion(questionObject: ElasticMultipleChoose, enable
   "#
 }
 
-function GenerateQuestionFromEnablementFile(enablementContent: string, questionBank: ElasticMultipleChooseSet[]) -> ElasticMultipleChoose {
+function GenerateQuestionFromEnablementFile(enablementContent: string, questionBank: ElasticMultipleTypeQuestionSet[]) -> ElasticMultipleTypeQuestion {
   // client "openai/gpt-4o"
   client "openai/gpt-4o"
   prompt #"
@@ -81,11 +94,13 @@ function GenerateQuestionFromEnablementFile(enablementContent: string, questionB
 
     For each question you generate:
     1. The question should be posed in plain English that requires a person to interpret using reading comprehension at the 6th grade level.
-    2. Use the content of the enablement file as the data context. And question should not ask outside of enablement file.
+    2. Use the content of the enablement file as the data context. The question should not ask outside of the enablement file.
     3. Provide the **question text** and the **correct answer** in the form of a JSON object.
     4. Ensure the questions are challenging yet fair, suitable for someone who has thoroughly reviewed the enablement content.
     5. Provide any necessary context or background information that might be needed to answer the question.
-    6. The target is to help support engineer become better on understanding the subject matter and troubleshooting
+    6. The target is to help support engineers become better at understanding the subject matter and troubleshooting.
+    7. You can generate multiple-choice questions or fill-in-the-blank questions with one phrase as the answer.
+    8. Fact about the enablement itself, like time or author is not relevant. focus on the content to become a better support engineer in soft skill and technically.
 
     Format the output as a JSON object with the following schema:
 
@@ -197,5 +212,13 @@ test ElasticCertificationQuestion {
 }
     "#
     context []
+  }
+}
+
+test TestGenerateQuestionFromEnablementFile {
+  functions [GenerateQuestionFromEnablementFile]
+  args {
+    enablementContent "This is a sample enablement content for testing purposes."
+    questionBank []
   }
 }

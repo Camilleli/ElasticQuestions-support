@@ -4,7 +4,7 @@ from rich.console import Console
 from rich.table import Table
 from rich import print
 from elasticsearch import Elasticsearch
-from ..baml_client.types import ElasticQuestion, ElasticSet, Category, ElasticMultipleChooseSet
+from ..baml_client.types import ElasticQuestion, ElasticSet, Category, ElasticMultipleTypeQuestionSet
 
 
 def validate_question(client: Elasticsearch, index: str, question: ElasticQuestion) -> bool:
@@ -69,7 +69,7 @@ def save_questions_to_markdown(questions: list[ElasticSet], index: str, filename
             f.write(f"| {question_escaped} | {category} | {answer_formatted} |\n")
     print(f"[bold green] ✅ Questions saved to: {filename} [/bold green]")
 
-def save_questions_to_json(questions: list[ElasticMultipleChooseSet], filename: str):
+def save_questions_to_json(questions: list[ElasticMultipleTypeQuestionSet], filename: str):
     """Save questions to a JSON file with each question on a new line."""
     with open(filename, 'w', encoding='utf-8') as f:
         for question_set in questions:
