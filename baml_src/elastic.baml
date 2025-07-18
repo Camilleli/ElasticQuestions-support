@@ -100,8 +100,10 @@ function GenerateQuestionFromEnablementFile(enablementContent: string, questionB
     5. Provide any necessary context or background information that might be needed to answer the question.
     6. The target is to help support engineers become better at understanding the subject matter and troubleshooting.
     7. You can generate multiple-choice questions or fill-in-the-blank questions with one phrase as the answer.
-    8. Fact about the enablement itself, like time or author is not relevant. focus on the content to become a better support engineer in soft skill and technically.
-
+    8. Encourage diversity in question topics by including sections such as exercises, guidelines, quotes, and other relevant details from the enablement content.
+    9. Avoid generating questions that focus on trivial details, such as specific times or durations, which do not contribute to understanding the core material.
+    10. Implement a mechanism to check for similarity in question structure and content to prevent generating questions that are too similar to existing ones in the question bank.
+    
     Format the output as a JSON object with the following schema:
 
     ---
