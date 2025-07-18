@@ -74,7 +74,7 @@ function ValidateGeneratedQuestion(questionObject: ElasticMultipleTypeQuestion, 
       {% endif %}
     {% elif questionObject.questionType == "fill-in-the-blank" %}
       {% set correct_answer = questionObject.answer %}
-      {% if correct_answer in enablementContent %}
+      {% if correct_answer in enablementContent and correct_answer.split()|length <= 3 %}
         true
       {% else %}
         false
@@ -99,7 +99,7 @@ function GenerateQuestionFromEnablementFile(enablementContent: string, questionB
     4. Ensure the questions are challenging yet fair, suitable for someone who has thoroughly reviewed the enablement content.
     5. Provide any necessary context or background information that might be needed to answer the question.
     6. The target is to help support engineers become better at understanding the subject matter and troubleshooting.
-    7. You can generate multiple-choice questions or fill-in-the-blank questions with one phrase as the answer.
+    7. You can generate multiple-choice questions or fill-in-the-blank questions. For fill-in-the-blank questions, restrict the answer to a phrase of up to three words. Ensure this restriction is strictly enforced.
     8. Encourage diversity in question topics by including sections such as exercises, guidelines, quotes, and other relevant details from the enablement content.
     9. Avoid generating questions that focus on trivial details, such as specific times or durations, which do not contribute to understanding the core material.
     10. Implement a mechanism to check for similarity in question structure and content to prevent generating questions that are too similar to existing ones in the question bank.
