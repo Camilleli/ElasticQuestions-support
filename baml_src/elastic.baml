@@ -74,7 +74,8 @@ function ValidateGeneratedQuestion(questionObject: ElasticMultipleTypeQuestion, 
       {% endif %}
     {% elif questionObject.questionType == "fill-in-the-blank" %}
       {% set correct_answer = questionObject.answer %}
-      {% if correct_answer in enablementContent and correct_answer.split()|length <= 3 %}
+      {% set word_count = correct_answer | length %}
+      {% if correct_answer in enablementContent and word_count <= 3 %}
         true
       {% else %}
         false
@@ -222,5 +223,17 @@ test TestGenerateQuestionFromEnablementFile {
   args {
     enablementContent "This is a sample enablement content for testing purposes."
     questionBank []
+  }
+}
+
+test TestValidateGeneratedQuestion {
+  functions [ValidateGeneratedQuestion]
+  args {
+    questionObject ElasticMultipleTypeQuestion {
+      question: "Based on the enablement content, what is the primary purpose of the text?",
+      answer: "testing purposes test test test",
+      questionType: "fill-in-the-blank"
+    }
+    enablementContent "Based on the enablement content, what is the primary purpose of the text? testing purposes test test test"
   }
 }
