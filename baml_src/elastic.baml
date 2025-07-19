@@ -104,7 +104,9 @@ function GenerateQuestionFromEnablementFile(enablementContent: string, questionB
     8. Encourage diversity in question topics by including sections such as exercises, guidelines, quotes, and other relevant details from the enablement content.
     9. Avoid generating questions that focus on trivial details, such as specific times or durations, which do not contribute to understanding the core material.
     10. Implement a mechanism to check for similarity in question structure and content to prevent generating questions that are too similar to existing ones in the question bank.
-    
+
+    Note: Utilize the provided question bank to ensure that newly generated questions are not duplicates or too similar to existing ones.
+
     Format the output as a JSON object with the following schema:
 
     ---
@@ -113,9 +115,9 @@ function GenerateQuestionFromEnablementFile(enablementContent: string, questionB
 
     {{_.role("assistant")}}
     {% set max_examples = 3 %}
-    {% set good_questions = question_bank | selectattr('validationClass.isValid', 'equalto', true) | map(attribute='questionClass') | list %}
+    {% set good_questions = questionBank | selectattr('validationClass.isValid', 'equalto', true) | map(attribute='questionClass') | list %}
     {% if good_questions %}
-      Here are some examples of good questions to avoid generating similar ones:
+      Here are some examples of good questions from the question bank to avoid generating similar ones:
       {% for question in good_questions %}
         Good Example: {{question}}
       {% endfor %}
