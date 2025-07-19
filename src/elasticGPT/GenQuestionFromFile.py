@@ -9,6 +9,8 @@ from elasticGPT.utils.helpers import save_questions_to_json
 import time
 import json
 import re
+import requests
+
 dotenv.load_dotenv()
 
 
@@ -17,6 +19,8 @@ def main(
     num_desired_questions: int = typer.Option(os.getenv("NUM_DESIRED_QUESTIONS"), envvar="NUM_DESIRED_QUESTIONS", help="How many questions do you want to generate?", prompt="How many questions do you want to generate?"),
 ):
     file_content = download_file(elastic_curl_url)
+    if file_content is None:
+        raise ValueError("Downloaded file content is null. Please check the URL or the file content.")
     question_bank: list[ElasticMultipleChooseSet] = []
     while len([q for q in question_bank if q.validationClass.isValid]) < num_desired_questions:  # Assuming 20 as the number of desired valid questions
         try:
@@ -62,29 +66,34 @@ def main(
         save_questions_to_json(bad_questions, filename=f"generations/bad_questions_{timestamp}.jsonl")
 
 def download_file(elastic_curl_url: str):
-    try:    
+    try:
         # Extract the file name from the URL using regex to handle special characters
         match = re.search(r"-o\s+'([^']+)'", elastic_curl_url)
         file_name = match.group(1) if match else None
-        
-        # Execute the command
-        result = os.system(elastic_curl_url)
-        if result == 0 and file_name:
-            print(f"File '{file_name}' downloaded successfully.")
-            try:
-                with open(file_name, 'r', encoding='utf-8') as file:
-                    file_content = file.read()
-                return file_content
-            except Exception as e:
-                print(f"An error occurred while reading the file '{file_name}': {e}")
+
+        # Extract the URL and headers from the command
+        url_match = re.search(r"https://[^\s]+", elastic_curl_url)
+        url = url_match.group(0) if url_match else None
+
+        headers_match = re.search(r"-H\s+'Authorization:\s*(\w+)'", elastic_curl_url)
+        headers = {"Authorization": headers_match.group(1)} if headers_match else {}
+        if url and file_name:
+            # Use requests to download the file
+            response = requests.get(url, headers=headers)
+            if response.status_code == 200:
+                with open(file_name, 'w', encoding='utf-8') as file:
+                    file.write(response.text)
+                print(f"File '{file_name}' downloaded successfully.")
+                return response.text
+            else:
+                print(f"Failed to download the file '{file_name}'. Status code: {response.status_code}")
                 return None
         else:
-            print(f"Failed to download the file '{file_name}'.")
-            return None          
+            print("Invalid URL or file name.")
+            return None
 
     except Exception as e:
         print(f"An error occurred: {e}")
         return None
-
 if __name__ == "__main__":
     typer.run(main)
