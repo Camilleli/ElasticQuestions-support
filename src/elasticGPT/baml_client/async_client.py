@@ -87,6 +87,13 @@ class BamlAsyncClient:
             "enablementContent": enablementContent,"questionBank": questionBank,
         })
         return typing.cast(types.ElasticMultipleTypeQuestion, result.cast_to(types, types, stream_types, False, __runtime__))
+    async def GenerateQuestionFromVideo(self, video: str,
+        baml_options: BamlCallOptions = {},
+    ) -> types.ElasticMultipleTypeQuestion:
+        result = await self.__options.merge_options(baml_options).call_function_async(function_name="GenerateQuestionFromVideo", args={
+            "video": video,
+        })
+        return typing.cast(types.ElasticMultipleTypeQuestion, result.cast_to(types, types, stream_types, False, __runtime__))
     async def ValidateGeneratedQuestion(self, questionObject: types.ElasticMultipleTypeQuestion,enablementContent: str,
         baml_options: BamlCallOptions = {},
     ) -> types.ElasticMultipleTypeQuestionValidation:
@@ -120,6 +127,18 @@ class BamlStreamClient:
     ) -> baml_py.BamlStream[stream_types.ElasticMultipleTypeQuestion, types.ElasticMultipleTypeQuestion]:
         ctx, result = self.__options.merge_options(baml_options).create_async_stream(function_name="GenerateQuestionFromEnablementFile", args={
             "enablementContent": enablementContent,"questionBank": questionBank,
+        })
+        return baml_py.BamlStream[stream_types.ElasticMultipleTypeQuestion, types.ElasticMultipleTypeQuestion](
+          result,
+          lambda x: typing.cast(stream_types.ElasticMultipleTypeQuestion, x.cast_to(types, types, stream_types, True, __runtime__)),
+          lambda x: typing.cast(types.ElasticMultipleTypeQuestion, x.cast_to(types, types, stream_types, False, __runtime__)),
+          ctx,
+        )
+    def GenerateQuestionFromVideo(self, video: str,
+        baml_options: BamlCallOptions = {},
+    ) -> baml_py.BamlStream[stream_types.ElasticMultipleTypeQuestion, types.ElasticMultipleTypeQuestion]:
+        ctx, result = self.__options.merge_options(baml_options).create_async_stream(function_name="GenerateQuestionFromVideo", args={
+            "video": video,
         })
         return baml_py.BamlStream[stream_types.ElasticMultipleTypeQuestion, types.ElasticMultipleTypeQuestion](
           result,
@@ -161,6 +180,13 @@ class BamlHttpRequestClient:
             "enablementContent": enablementContent,"questionBank": questionBank,
         }, mode="request")
         return result
+    async def GenerateQuestionFromVideo(self, video: str,
+        baml_options: BamlCallOptions = {},
+    ) -> baml_py.baml_py.HTTPRequest:
+        result = await self.__options.merge_options(baml_options).create_http_request_async(function_name="GenerateQuestionFromVideo", args={
+            "video": video,
+        }, mode="request")
+        return result
     async def ValidateGeneratedQuestion(self, questionObject: types.ElasticMultipleTypeQuestion,enablementContent: str,
         baml_options: BamlCallOptions = {},
     ) -> baml_py.baml_py.HTTPRequest:
@@ -188,6 +214,13 @@ class BamlHttpStreamRequestClient:
     ) -> baml_py.baml_py.HTTPRequest:
         result = await self.__options.merge_options(baml_options).create_http_request_async(function_name="GenerateQuestionFromEnablementFile", args={
             "enablementContent": enablementContent,"questionBank": questionBank,
+        }, mode="stream")
+        return result
+    async def GenerateQuestionFromVideo(self, video: str,
+        baml_options: BamlCallOptions = {},
+    ) -> baml_py.baml_py.HTTPRequest:
+        result = await self.__options.merge_options(baml_options).create_http_request_async(function_name="GenerateQuestionFromVideo", args={
+            "video": video,
         }, mode="stream")
         return result
     async def ValidateGeneratedQuestion(self, questionObject: types.ElasticMultipleTypeQuestion,enablementContent: str,

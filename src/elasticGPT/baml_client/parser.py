@@ -34,6 +34,12 @@ class LlmResponseParser:
         result = self.__options.merge_options(baml_options).parse_response(function_name="GenerateQuestionFromEnablementFile", llm_response=llm_response, mode="request")
         return typing.cast(types.ElasticMultipleTypeQuestion, result)
 
+    def GenerateQuestionFromVideo(
+        self, llm_response: str, baml_options: BamlCallOptions = {},
+    ) -> types.ElasticMultipleTypeQuestion:
+        result = self.__options.merge_options(baml_options).parse_response(function_name="GenerateQuestionFromVideo", llm_response=llm_response, mode="request")
+        return typing.cast(types.ElasticMultipleTypeQuestion, result)
+
     def ValidateGeneratedQuestion(
         self, llm_response: str, baml_options: BamlCallOptions = {},
     ) -> types.ElasticMultipleTypeQuestionValidation:
@@ -58,6 +64,12 @@ class LlmStreamParser:
         self, llm_response: str, baml_options: BamlCallOptions = {},
     ) -> stream_types.ElasticMultipleTypeQuestion:
         result = self.__options.merge_options(baml_options).parse_response(function_name="GenerateQuestionFromEnablementFile", llm_response=llm_response, mode="stream")
+        return typing.cast(stream_types.ElasticMultipleTypeQuestion, result)
+
+    def GenerateQuestionFromVideo(
+        self, llm_response: str, baml_options: BamlCallOptions = {},
+    ) -> stream_types.ElasticMultipleTypeQuestion:
+        result = self.__options.merge_options(baml_options).parse_response(function_name="GenerateQuestionFromVideo", llm_response=llm_response, mode="stream")
         return typing.cast(stream_types.ElasticMultipleTypeQuestion, result)
 
     def ValidateGeneratedQuestion(

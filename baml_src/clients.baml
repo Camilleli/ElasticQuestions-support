@@ -53,6 +53,20 @@ client<llm> OpenaiFallback {
   }
 }
 
+client<llm> AWSBedrock {
+  provider aws-bedrock
+  options {
+    model "anthropic.claude-opus-4-20250514-v1:0"
+  }
+}
+
+client<llm> GoogleAI {
+  provider google-ai
+  options {
+    model "gemini-2.5-pro"
+  }
+}
+
 // https://docs.boundaryml.com/docs/snippets/clients/retry
 retry_policy Constant {
   max_retries 3

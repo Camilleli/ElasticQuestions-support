@@ -133,6 +133,14 @@ function GenerateQuestionFromEnablementFile(enablementContent: string, questionB
     Generate a question and answer pair based on the enablement content, ensuring it is not similar to the good questions provided.
   "#
 }
+function GenerateQuestionFromVideo(video: string)-> ElasticMultipleTypeQuestion {
+  client GoogleAI
+  prompt #"
+  {{ _.role("user")}}
+  summaries the video:
+   {{ video }}
+  "#
+}
 
 function GenerateElasticCertificationQuestion(subject: Category, index: string, mapping: string, data: string, context: ElasticSet[]) -> ElasticQuestion {
   // client "openai/gpt-4.1"
