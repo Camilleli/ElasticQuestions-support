@@ -1,6 +1,8 @@
 import typer
 import os
 from baml_client import b
+from baml_py import Video
+from baml_py import ClientRegistry
 from baml_client.types import ElasticSet, ElasticMultipleTypeQuestionSet
 from baml_py.errors import BamlError, BamlInvalidArgumentError, BamlClientError, BamlClientHttpError, BamlValidationError
 import dotenv
@@ -10,6 +12,8 @@ import time
 import json
 import re
 import requests
+import base64
+
 
 dotenv.load_dotenv()
 
@@ -22,17 +26,26 @@ def main(
     if file_content is None:
         raise ValueError("Downloaded file content is null. Please check the URL or the file content.")
     question_bank: list[ElasticMultipleChooseSet] = []
+    cr = ClientRegistry()
+    if file_content is str:
+         cr.set_primary("openai/gpt-4o")
+        
+    else:
+        cr.set_primary("GoogleAI")
+        
     while len([q for q in question_bank if q.validationClass.isValid]) < num_desired_questions:  # Assuming 20 as the number of desired valid questions
         try:
             question = b.GenerateQuestionFromEnablementFile(
                 enablementContent=file_content, 
-                questionBank=question_bank
+                questionBank=question_bank,
+                baml_options={"client_registry": cr}
             )
             print("Question:")
             print(json.dumps(vars(question),indent=2))
             validation_result = b.ValidateGeneratedQuestion(
                 questionObject=question,
-                enablementContent=file_content
+                enablementContent=file_content,
+                baml_options={"client_registry": cr}
             )
             print("Validation Result:")
             print(json.dumps(vars(validation_result),indent=2))
@@ -40,13 +53,15 @@ def main(
             if validation_result.isValid:
                 good_question = ElasticMultipleTypeQuestionSet(
                     questionClass=question,
-                    validationClass=validation_result
+                    validationClass=validation_result,
+                    baml_options={"client_registry": cr}
                 )
                 question_bank.append(good_question)
             else:
                 bad_question = ElasticMultipleTypeQuestionSet(
                     questionClass=question,
-                    validationClass=validation_result
+                    validationClass=validation_result,
+                    baml_options={"client_registry": cr}
                 )
                 question_bank.append(bad_question)
         except Exception as e:
@@ -82,7 +97,11 @@ def download_file(elastic_curl_url: str):
             response = requests.get(url, headers=headers)
             if response.status_code == 200:
                 print(f"File '{file_name}' downloaded successfully.")
-                return response.text
+                if file_name.endswith('.mp4'):
+                    b64 = base64.b64encode(response.content).decode("ascii")
+                    return Video.from_base64("video/mp4", b64)
+                else:
+                    return response.text
             else:
                 print(f"Failed to download the file '{file_name}'. Status code: {response.status_code}")
                 return None

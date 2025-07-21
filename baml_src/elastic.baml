@@ -32,7 +32,7 @@ class ElasticSet {
   corpus ElasticQuestion @description("The questions, answers and categories in the set")
   rating "Good" | "Bad" @description("The rating of the set")
 }
-function ValidateGeneratedQuestion(questionObject: ElasticMultipleTypeQuestion, enablementContent: string) -> ElasticMultipleTypeQuestionValidation {
+function ValidateGeneratedQuestion(questionObject: ElasticMultipleTypeQuestion, enablementContent: string | video) -> ElasticMultipleTypeQuestionValidation {
    // client "openai/gpt-4o"
   client "openai/gpt-4o"
   prompt #"
@@ -58,7 +58,9 @@ function ValidateGeneratedQuestion(questionObject: ElasticMultipleTypeQuestion, 
     // {{ctx.output_format}}
     ---
 
-    {{_.role("assistant")}}
+    {% if enablementContent is string %}
+      {{_.role("assistant")}}
+    {% endif %}
     {% if questionObject.questionType == "mc" %}
       {% set correct_answer = questionObject.answer %}
       {% set options = ["A", "B", "C", "D"] %}
@@ -86,16 +88,16 @@ function ValidateGeneratedQuestion(questionObject: ElasticMultipleTypeQuestion, 
   "#
 }
 
-function GenerateQuestionFromEnablementFile(enablementContent: string, questionBank: ElasticMultipleTypeQuestionSet[]) -> ElasticMultipleTypeQuestion {
+function GenerateQuestionFromEnablementFile(enablementContent: string | video, questionBank: ElasticMultipleTypeQuestionSet[]) -> ElasticMultipleTypeQuestion {
   // client "openai/gpt-4o"
   client "openai/gpt-4o"
   prompt #"
     {{_.role("system")}}
-    You are an AI assistant trained to generate questions based on enablement content provided in a text file. Your task is to create questions that test the knowledge of the content within the file. The questions should be realistic and reflect the depth of understanding expected from someone who has studied the enablement material.
+    You are an AI assistant trained to generate questions based on enablement content provided in either a text file or a video. Your task is to create questions that test the knowledge of the content within the provided material. The questions should be realistic and reflect the depth of understanding expected from someone who has studied the enablement material.
 
     For each question you generate:
     1. The question should be posed in plain English that requires a person to interpret using reading comprehension at the 6th grade level.
-    2. Use the content of the enablement file as the data context. The question should not ask outside of the enablement file.
+    2. Use the content of the enablement material as the data context. The question should not ask outside of the enablement material.
     3. Provide the **question text** and the **correct answer** in the form of a JSON object.
     4. Ensure the questions are challenging yet fair, suitable for someone who has thoroughly reviewed the enablement content.
     5. Provide any necessary context or background information that might be needed to answer the question.
@@ -113,7 +115,9 @@ function GenerateQuestionFromEnablementFile(enablementContent: string, questionB
     // {{ctx.output_format}}
     ---
 
-    {{_.role("assistant")}}
+    {% if enablementContent is string %}
+      {{_.role("assistant")}}
+    {% endif %}
     {% set max_examples = 3 %}
     {% set good_questions = questionBank | selectattr('validationClass.isValid', 'equalto', true) | map(attribute='questionClass') | list %}
     {% if good_questions %}
@@ -122,10 +126,11 @@ function GenerateQuestionFromEnablementFile(enablementContent: string, questionB
         Good Example: {{question}}
       {% endfor %}
     {% endif %}
+    
     ---
 
     {{_.role("user")}}
-    Here is the content of the enablement file:
+    Here is the content of the enablement material:
     ---
     {{enablementContent}}
     ---
@@ -133,12 +138,12 @@ function GenerateQuestionFromEnablementFile(enablementContent: string, questionB
     Generate a question and answer pair based on the enablement content, ensuring it is not similar to the good questions provided.
   "#
 }
-function GenerateQuestionFromVideo(video: string)-> ElasticMultipleTypeQuestion {
+function GenerateQuestionFromVideo(video: video)-> ElasticMultipleTypeQuestion {
   client GoogleAI
   prompt #"
   {{ _.role("user")}}
-  summaries the video:
-   {{ video }}
+    summaries the video:
+  {{ video }}
   "#
 }
 
