@@ -81,8 +81,6 @@ def download_file(elastic_curl_url: str):
             # Use requests to download the file
             response = requests.get(url, headers=headers)
             if response.status_code == 200:
-                with open(file_name, 'w', encoding='utf-8') as file:
-                    file.write(response.text)
                 print(f"File '{file_name}' downloaded successfully.")
                 return response.text
             else:
